@@ -1,0 +1,12 @@
+{
+  "_note": "Rename this file to match your clip basename, e.g. argentina-france-2022-108-messi-shot.meta.json next to argentina-france-2022-108-messi-shot.mp4. Delete this file when not in use.",
+  "competition": "FIFA World Cup",
+  "season": "2022",
+  "match": "Argentina vs France",
+  "date": "2022-12-18",
+  "minute": "108",
+  "team_focus": "Argentina",
+  "event": "extra-time attacking sequence ending in Messi shot",
+  "desired_mode": "improve_attack",
+  "play_was_for_focus_team": true
+}

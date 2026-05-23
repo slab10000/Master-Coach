@@ -1,0 +1,12 @@
+node_modules
+.next
+.env.local
+.DS_Store
+*.log
+analysis/
+clips/inbox/*.mp4
+clips/inbox/*.mov
+!clips/inbox/.gitkeep
+.rocketride/
+tsconfig.tsbuildinfo
+next-env.d.ts

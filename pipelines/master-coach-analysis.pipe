@@ -1,0 +1,123 @@
+{
+  "$schema": "https://docs.rocketride.org/schema/pipe.v1.json",
+  "name": "master-coach-analysis",
+  "version": "0.1.0",
+  "description": "Local football clip → tactical board + Nano Banana broadcast overlays + coach fixes.",
+  "source": {
+    "id": "src.webhook",
+    "type": "webhook",
+    "path": "/master-coach/analyze",
+    "input_schema": {
+      "type": "object",
+      "required": ["clip_id", "clip_path"],
+      "properties": {
+        "clip_id": { "type": "string" },
+        "clip_path": { "type": "string" },
+        "match_hint": { "type": "object" }
+      }
+    }
+  },
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "custom_code",
+      "label": "Local Clip Intake",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/intake.ts",
+      "inputs": ["src.webhook"],
+      "outputs": ["intake.json"]
+    },
+    {
+      "id": "extract_frames",
+      "type": "custom_code",
+      "label": "Frame Extraction (ffmpeg @ 4fps)",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/extractFrames.ts",
+      "inputs": ["intake"]
+    },
+    {
+      "id": "match_context",
+      "type": "llm.gemini",
+      "label": "Match Context (Google Search grounding)",
+      "model": "${env.GEMINI_TEXT_MODEL}",
+      "tools": ["google_search"],
+      "inputs": ["src.webhook"]
+    },
+    {
+      "id": "match_facts",
+      "type": "llm.gemini.structured",
+      "label": "Match Facts JSON",
+      "model": "${env.GEMINI_TEXT_MODEL}",
+      "schema": "match_context.json",
+      "inputs": ["match_context"]
+    },
+    {
+      "id": "gemini_tactical",
+      "type": "llm.gemini.video",
+      "label": "Multimodal Tactical Analysis",
+      "model": "${env.GEMINI_VIDEO_MODEL}",
+      "schema": "tactical_analysis.json",
+      "inputs": ["intake", "match_facts"]
+    },
+    {
+      "id": "classify_frames",
+      "type": "custom_code",
+      "label": "Per-frame Classifier (GMI Cloud → Google fallback)",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/classifyFrames.ts",
+      "provider_toggle": "${env.VISION_PROVIDER}",
+      "providers": {
+        "gmi": {
+          "endpoint": "${env.GMI_BASE_URL}/chat/completions",
+          "model": "${env.GMI_VISION_MODEL}"
+        },
+        "google": {
+          "model": "${env.GEMINI_TEXT_MODEL}"
+        }
+      },
+      "inputs": ["extract_frames"]
+    },
+    {
+      "id": "select_hero_frames",
+      "type": "custom_code",
+      "label": "Hero Frame Selection",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/selectHeroFrames.ts",
+      "inputs": ["gemini_tactical", "classify_frames"]
+    },
+    {
+      "id": "annotate_frames",
+      "type": "llm.gemini.image_edit",
+      "label": "Nano Banana Broadcast Overlays",
+      "model": "${env.GEMINI_IMAGE_EDIT_MODEL}",
+      "entry": "lib/pipeline/stages/annotateFrames.ts",
+      "inputs": ["select_hero_frames"]
+    },
+    {
+      "id": "strategy_scene",
+      "type": "custom_code",
+      "label": "Strategy Scene Builder",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/strategyScene.ts",
+      "inputs": ["gemini_tactical"]
+    },
+    {
+      "id": "counterplay",
+      "type": "llm.gemini.structured",
+      "label": "Coach Fix / Counterplay",
+      "model": "${env.GEMINI_TEXT_MODEL}",
+      "schema": "counterplay.json",
+      "entry": "lib/pipeline/stages/counterplay.ts",
+      "inputs": ["gemini_tactical", "strategy_scene"]
+    }
+  ],
+  "outputs": [
+    "analysis/${clip_id}/intake.json",
+    "analysis/${clip_id}/match_context.json",
+    "analysis/${clip_id}/tactical_analysis.json",
+    "analysis/${clip_id}/frame_observations.json",
+    "analysis/${clip_id}/hero_frames/*.png",
+    "analysis/${clip_id}/strategy_scene.json",
+    "analysis/${clip_id}/counterplay.json"
+  ]
+}

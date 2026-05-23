@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Bebas Neue", "Oswald", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", monospace;
+}
+
+html,
+body {
+  background: #050d0b;
+  color: #f8f5ec;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.stadium-bg {
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(245, 196, 81, 0.08), transparent 60%),
+    radial-gradient(120% 80% at 50% 100%, rgba(77, 216, 255, 0.06), transparent 60%),
+    linear-gradient(180deg, #071411 0%, #050d0b 60%, #030806 100%);
+}
+
+.pitch-stripes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.0) 0,
+    rgba(255, 255, 255, 0.0) 7%,
+    rgba(255, 255, 255, 0.04) 7%,
+    rgba(255, 255, 255, 0.04) 14%
+  );
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    rgba(248, 245, 236, 0.6),
+    #f5c451 30%,
+    #ffe9a8 50%,
+    #f5c451 70%,
+    rgba(248, 245, 236, 0.6)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% center;
+  }
+}
+
+.glow {
+  box-shadow:
+    0 0 0 1px rgba(245, 196, 81, 0.2),
+    0 8px 30px -10px rgba(245, 196, 81, 0.4);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(245, 196, 81, 0.25);
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
