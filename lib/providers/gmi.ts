@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import OpenAI from "openai";
 import type { VisionProvider } from "./vision";
+import { imageMimeType } from "./imageMime";
 import type { FrameClassification } from "@/lib/types";
 
 let _client: OpenAI | null = null;
@@ -24,7 +25,7 @@ export class GMIVisionProvider implements VisionProvider {
     hint: string,
   ): Promise<FrameClassification> {
     const img = await fs.readFile(framePath);
-    const dataUrl = `data:image/jpeg;base64,${img.toString("base64")}`;
+    const dataUrl = `data:${imageMimeType(framePath)};base64,${img.toString("base64")}`;
     const model = process.env.GMI_VISION_MODEL ?? "Qwen/Qwen2.5-VL-7B-Instruct";
 
     const prompt = `Frame at ${timestamp.toFixed(2)}s. Hint: ${hint}.

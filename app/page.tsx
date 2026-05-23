@@ -273,23 +273,13 @@ function CoachStage() {
       <div className="coach-video-shell absolute bottom-[-12px] right-[96px] z-20 w-[min(47vw,720px)]">
         <video
           src="/landing/coach-talkin.webm"
-          poster="/landing/coach-cutout.png"
+          poster="/landing/coach-cutout.webp"
           className="coach-video h-auto w-full select-none drop-shadow-[0_42px_70px_rgba(0,0,0,0.68)]"
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
-          aria-hidden="true"
-        />
-      </div>
-
-      <div className="trophy-layer absolute bottom-[-22px] right-[-14px] z-10 w-[190px] opacity-95 xl:right-4 xl:w-[250px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/landing/trophy.png"
-          alt=""
-          className="h-auto w-full drop-shadow-[0_30px_70px_rgba(245,196,81,0.18)]"
           aria-hidden="true"
         />
       </div>

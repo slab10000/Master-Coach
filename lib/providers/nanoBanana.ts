@@ -1,5 +1,10 @@
 import { promises as fs } from "node:fs";
+import { exec } from "node:child_process";
+import { promisify } from "node:util";
 import { googleClient } from "./google";
+import { imageMimeType } from "./imageMime";
+
+const execAsync = promisify(exec);
 
 export interface AnnotationRequest {
   framePath: string;
@@ -33,7 +38,7 @@ Return only the edited image.`;
           role: "user",
           parts: [
             { text: fullPrompt },
-            { inlineData: { mimeType: "image/jpeg", data: img.toString("base64") } },
+            { inlineData: { mimeType: imageMimeType(framePath), data: img.toString("base64") } },
           ],
         },
       ],
@@ -43,20 +48,47 @@ Return only the edited image.`;
       const inline = (part as { inlineData?: { data?: string; mimeType?: string } }).inlineData;
       if (inline?.data) {
         const buf = Buffer.from(inline.data, "base64");
-        await fs.writeFile(outPath, buf);
+        await writeWebp(buf, inline.mimeType, outPath);
         return outPath;
       }
     }
     console.warn("Nano Banana returned no image, falling back to original frame");
-    await fs.copyFile(framePath, outPath);
+    await convertToWebp(framePath, outPath);
     return outPath;
   } catch (err) {
     console.error("annotateFrame error", err);
     try {
-      await fs.copyFile(framePath, outPath);
+      await convertToWebp(framePath, outPath);
       return outPath;
     } catch {
       return null;
     }
   }
+}
+
+async function writeWebp(
+  buf: Buffer,
+  mimeType: string | undefined,
+  outPath: string,
+): Promise<void> {
+  const sourceExt = mimeType?.includes("png")
+    ? ".png"
+    : mimeType?.includes("webp")
+      ? ".webp"
+      : ".jpg";
+  const sourcePath = `${outPath}.source${sourceExt}`;
+  await fs.writeFile(sourcePath, buf);
+  try {
+    await convertToWebp(sourcePath, outPath);
+  } finally {
+    await fs.rm(sourcePath, { force: true });
+  }
+}
+
+async function convertToWebp(sourcePath: string, outPath: string): Promise<void> {
+  if (sourcePath.toLowerCase().endsWith(".webp")) {
+    await fs.copyFile(sourcePath, outPath);
+    return;
+  }
+  await execAsync(`cwebp -quiet -q 82 "${sourcePath}" -o "${outPath}"`);
 }

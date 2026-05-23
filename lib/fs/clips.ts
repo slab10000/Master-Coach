@@ -46,17 +46,21 @@ export async function listClips(): Promise<ClipMeta[]> {
     } catch {}
 
     let thumbnailPath: string | undefined;
-    const thumbDest = path.join(analysisFolder, "thumbnail.jpg");
+    const thumbDest = path.join(analysisFolder, "thumbnail.webp");
     try {
       await fs.access(thumbDest);
-      thumbnailPath = `/api/files/${id}/thumbnail.jpg`;
+      thumbnailPath = `/api/files/${id}/thumbnail.webp`;
     } catch {
       try {
         await fs.mkdir(analysisFolder, { recursive: true });
-        await execAsync(
-          `ffmpeg -y -ss 00:00:02 -i "${fullPath}" -frames:v 1 -q:v 3 "${thumbDest}"`,
-        );
-        thumbnailPath = `/api/files/${id}/thumbnail.jpg`;
+        const tempThumb = path.join(analysisFolder, "thumbnail.jpg");
+        await execAsync(`ffmpeg -y -ss 00:00:02 -i "${fullPath}" -frames:v 1 -q:v 3 "${tempThumb}"`);
+        try {
+          await execAsync(`cwebp -quiet -q 82 "${tempThumb}" -o "${thumbDest}"`);
+        } finally {
+          await fs.rm(tempThumb, { force: true });
+        }
+        thumbnailPath = `/api/files/${id}/thumbnail.webp`;
       } catch {}
     }
 

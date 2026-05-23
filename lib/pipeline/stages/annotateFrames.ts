@@ -63,7 +63,7 @@ export async function annotateFrames(
   const results = await Promise.all(
     candidates.map((c) =>
       limit(async () => {
-        const outPath = path.join(outDir, `${c.event.id}.png`);
+        const outPath = path.join(outDir, `${c.event.id}.webp`);
         const prompt = buildPrompt(c, analysis);
         await annotateFrame({ framePath: c.frame.framePath, outPath, prompt });
         done++;
@@ -77,7 +77,7 @@ export async function annotateFrames(
         const hero: HeroFrame = {
           eventId: c.event.id,
           framePath: `/api/files/${clipId}/frames/${path.basename(c.frame.framePath)}`,
-          annotatedPath: `/api/files/${clipId}/hero_frames/${c.event.id}.png`,
+          annotatedPath: `/api/files/${clipId}/hero_frames/${c.event.id}.webp`,
           timestamp: c.event.start,
           caption: c.event.tactical_effect || c.event.description,
         };

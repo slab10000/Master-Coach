@@ -116,7 +116,7 @@
     "analysis/${clip_id}/match_context.json",
     "analysis/${clip_id}/tactical_analysis.json",
     "analysis/${clip_id}/frame_observations.json",
-    "analysis/${clip_id}/hero_frames/*.png",
+    "analysis/${clip_id}/hero_frames/*.webp",
     "analysis/${clip_id}/strategy_scene.json",
     "analysis/${clip_id}/counterplay.json"
   ]

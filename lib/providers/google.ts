@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import { GoogleGenAI, Type } from "@google/genai";
 import type { VisionProvider } from "./vision";
+import { imageMimeType } from "./imageMime";
 import type { FrameClassification } from "@/lib/types";
 
 let _client: GoogleGenAI | null = null;
@@ -54,7 +55,7 @@ Do not say a frame is a key moment unless it visually contains the trigger.`;
             role: "user",
             parts: [
               { text: prompt },
-              { inlineData: { mimeType: "image/jpeg", data: img.toString("base64") } },
+              { inlineData: { mimeType: imageMimeType(framePath), data: img.toString("base64") } },
             ],
           },
         ],

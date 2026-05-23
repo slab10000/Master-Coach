@@ -340,7 +340,7 @@ Output:
   "frames": [
     {
       "timestamp": 0.0,
-      "path": "analysis/clip-id/frames/frame_000.jpg"
+      "path": "analysis/clip-id/frames/frame_000.webp"
     }
   ]
 }
@@ -994,4 +994,3 @@ Then Master Coach switches into Coach Fix mode. If this was against our team, it
 
 The end product is not a chatbot answer. It is a visual coaching artifact.
 ```
-
