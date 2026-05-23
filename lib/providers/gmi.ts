@@ -16,6 +16,17 @@ export function gmiClient(): OpenAI {
   return _client;
 }
 
+// Strip ```json ... ``` fences (Claude Haiku ignores response_format and wraps).
+// Falls back to extracting the first {...} block if no fence is present.
+function extractJson(text: string): string {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (fenced) return fenced[1].trim();
+  const first = text.indexOf("{");
+  const last = text.lastIndexOf("}");
+  if (first !== -1 && last > first) return text.slice(first, last + 1);
+  return text.trim();
+}
+
 export class GMIVisionProvider implements VisionProvider {
   name = "gmi" as const;
 
@@ -48,7 +59,7 @@ Mark is_key_moment=true only if this frame contains the start of a tactical trig
         response_format: { type: "json_object" },
       });
       const text = res.choices[0]?.message?.content ?? "{}";
-      const parsed = JSON.parse(text);
+      const parsed = JSON.parse(extractJson(text));
       return {
         framePath,
         timestamp,

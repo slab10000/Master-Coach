@@ -52,7 +52,7 @@ async function renderMinimap(
   outPath: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const ai = googleClient();
-  const model = process.env.GEMINI_IMAGE_EDIT_MODEL ?? "gemini-2.5-flash-image-preview";
+  const model = process.env.GEMINI_IMAGE_EDIT_MODEL ?? "gemini-3.1-flash-image-preview";
   const img = await fs.readFile(framePath);
   try {
     const result = await ai.models.generateContent({

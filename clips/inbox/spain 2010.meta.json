@@ -1,0 +1,11 @@
+{
+  "competition": "FIFA World Cup",
+  "season": "2010",
+  "match": "Spain vs Netherlands",
+  "date": "2010-07-11",
+  "minute": "116",
+  "team_focus": "Spain",
+  "event": "extra-time attacking sequence ending in Iniesta's winning goal",
+  "desired_mode": "improve_attack",
+  "play_was_for_focus_team": true
+}

@@ -85,6 +85,7 @@ export async function annotateFrames(
       }),
     ),
   );
+  results.sort((a, b) => a.timestamp - b.timestamp);
   await writeJson(clipId, "hero_frames.json", results);
   emitStage(clipId, "annotateFrames", "done", `Drew ${results.length} broadcast overlays`);
   return results;

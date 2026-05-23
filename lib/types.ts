@@ -159,6 +159,7 @@ export interface HeroFrame {
   eventId: string;
   framePath: string;
   annotatedPath: string;
+  topdownPath?: string;
   timestamp: number;
   caption: string;
 }
@@ -174,6 +175,7 @@ export type PipelineStage =
   | "classifyFrames"
   | "selectHeroFrames"
   | "annotateFrames"
+  | "strategyImages"
   | "strategyScene"
   | "counterplay";
 
@@ -197,6 +199,7 @@ export const STAGE_LABELS: Record<PipelineStage, string> = {
   classifyFrames: "Mapping ball action",
   selectHeroFrames: "Choosing hero moments",
   annotateFrames: "Drawing tactical overlays",
+  strategyImages: "Drawing broadcast + top-down per hero frame",
   strategyScene: "Building tactical board",
   counterplay: "Generating coach fixes",
 };

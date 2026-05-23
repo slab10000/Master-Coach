@@ -60,30 +60,6 @@
       "inputs": ["intake", "match_facts"]
     },
     {
-      "id": "topdown_minimaps",
-      "type": "llm.gemini.image_edit",
-      "label": "Top-down Tactical Minimaps (fan-out, parallel)",
-      "model": "${env.GEMINI_IMAGE_EDIT_MODEL}",
-      "runtime": "node",
-      "entry": "lib/pipeline/stages/topdownMinimaps.ts",
-      "fanout": {
-        "over": "extract_frames.samples",
-        "sample_count": 6,
-        "concurrency": 6
-      },
-      "inputs": ["extract_frames"]
-    },
-    {
-      "id": "geometry_pass",
-      "type": "llm.gemini.structured",
-      "label": "Pitch Geometry Solver (events + minimaps → x/y)",
-      "model": "${env.GEMINI_TEXT_MODEL}",
-      "runtime": "node",
-      "entry": "lib/pipeline/stages/geometryPass.ts",
-      "schema": "geometry.json",
-      "inputs": ["gemini_tactical", "topdown_minimaps"]
-    },
-    {
       "id": "classify_frames",
       "type": "custom_code",
       "label": "Per-frame Classifier (GMI Cloud → Google fallback)",
@@ -110,12 +86,27 @@
       "inputs": ["gemini_tactical", "classify_frames"]
     },
     {
-      "id": "annotate_frames",
+      "id": "strategy_images",
       "type": "llm.gemini.image_edit",
-      "label": "Nano Banana Broadcast Overlays",
+      "label": "Nano Banana Broadcast Overlay + Top-down Schema (2 calls/frame, parallel)",
       "model": "${env.GEMINI_IMAGE_EDIT_MODEL}",
-      "entry": "lib/pipeline/stages/annotateFrames.ts",
-      "inputs": ["select_hero_frames"]
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/strategyImages.ts",
+      "fanout": {
+        "over": "select_hero_frames",
+        "concurrency": 12
+      },
+      "inputs": ["select_hero_frames", "gemini_tactical"]
+    },
+    {
+      "id": "geometry_pass",
+      "type": "llm.gemini.structured",
+      "label": "Pitch Geometry Solver (events + top-down schemas → x/y)",
+      "model": "${env.GEMINI_TEXT_MODEL}",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/geometryPass.ts",
+      "schema": "geometry.json",
+      "inputs": ["gemini_tactical", "strategy_images"]
     },
     {
       "id": "strategy_scene",
@@ -141,7 +132,8 @@
     "analysis/${clip_id}/tactical_analysis.json",
     "analysis/${clip_id}/frame_observations.json",
     "analysis/${clip_id}/hero_frames/*.webp",
-    "analysis/${clip_id}/minimaps/*.webp",
+    "clips/strategy_images/${clip_id}/*.broadcast.webp",
+    "clips/strategy_images/${clip_id}/*.topdown.webp",
     "analysis/${clip_id}/minimaps.json",
     "analysis/${clip_id}/geometry.json",
     "analysis/${clip_id}/strategy_scene.json",
