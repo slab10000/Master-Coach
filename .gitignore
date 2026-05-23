@@ -10,3 +10,6 @@ clips/inbox/*.mov
 .rocketride/
 tsconfig.tsbuildinfo
 next-env.d.ts
+output/
+assets/
+

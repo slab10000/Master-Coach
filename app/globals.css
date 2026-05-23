@@ -61,6 +61,176 @@ body {
     0 8px 30px -10px rgba(245, 196, 81, 0.4);
 }
 
+.world-cup-landing {
+  position: relative;
+  isolation: isolate;
+  background: #030806;
+  height: 100vh;
+  max-height: 100vh;
+}
+
+.landing-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("/landing/world-cup-stadium-bg.png");
+  background-position: center top;
+  background-size: cover;
+  transform: scale(1.02);
+  filter: saturate(1.08) contrast(1.06);
+}
+
+.landing-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(50% 56% at 78% 42%, rgba(245, 196, 81, 0.13), transparent 58%),
+    radial-gradient(42% 42% at 48% 36%, rgba(77, 216, 255, 0.08), transparent 68%),
+    linear-gradient(90deg, rgba(3, 8, 6, 0.92) 0%, rgba(3, 8, 6, 0.64) 30%, rgba(3, 8, 6, 0.18) 56%, rgba(3, 8, 6, 0.56) 100%),
+    linear-gradient(180deg, rgba(3, 8, 6, 0.18) 0%, rgba(3, 8, 6, 0.2) 48%, rgba(3, 8, 6, 0.82) 100%);
+}
+
+.confetti-field {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -12vh;
+  left: var(--x);
+  width: var(--w);
+  height: var(--h);
+  border-radius: 1px;
+  background: var(--color);
+  opacity: 0.78;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--color), transparent 55%);
+  animation: confettiFall var(--duration) linear var(--delay) infinite;
+  will-change: transform;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translate3d(0, -14vh, 0) rotate(0deg) skew(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(var(--drift), 116vh, 0) rotate(var(--spin)) skew(18deg);
+    opacity: 0.2;
+  }
+}
+
+.coach-video {
+  animation: coachFloat 5.8s ease-in-out infinite;
+}
+
+@keyframes coachFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(0.35deg);
+  }
+}
+
+.pipeline-detail {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .landing-background {
+    background-position: 62% top;
+    opacity: 0.8;
+  }
+
+  .landing-vignette {
+    background:
+      linear-gradient(90deg, rgba(3, 8, 6, 0.94), rgba(3, 8, 6, 0.6)),
+      linear-gradient(180deg, rgba(3, 8, 6, 0.16), rgba(3, 8, 6, 0.9));
+  }
+}
+
+@media (max-height: 860px) and (min-width: 1024px) {
+  .landing-date {
+    margin-bottom: 0.55rem !important;
+  }
+
+  .landing-title {
+    font-size: 4.75rem !important;
+    line-height: 0.78 !important;
+  }
+
+  .landing-copy {
+    margin-top: 0.75rem !important;
+    max-width: 42rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .hero-clip-panel {
+    margin-top: 1rem !important;
+    max-width: 610px !important;
+    grid-template-columns: minmax(0, 1fr) 168px !important;
+  }
+
+  .hero-clip-header {
+    margin-bottom: 0.55rem !important;
+  }
+
+  .hero-clip-media {
+    height: 136px !important;
+  }
+
+  .hero-clip-meta {
+    padding-top: 0.55rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .hero-clip-title {
+    font-size: 1.65rem !important;
+  }
+
+  .hero-launch {
+    min-height: 96px !important;
+  }
+
+  .hero-secondary-action {
+    display: none !important;
+  }
+
+  .pipeline-title {
+    font-size: 1.25rem !important;
+  }
+
+  .pipeline-step {
+    gap: 0.65rem !important;
+    padding: 0.6rem !important;
+  }
+
+  .pipeline-icon {
+    height: 2.55rem !important;
+    width: 2.55rem !important;
+  }
+
+  .coach-video-shell {
+    width: min(43vw, 650px) !important;
+    right: 112px !important;
+    bottom: 8px !important;
+  }
+
+  .trophy-layer {
+    width: 190px !important;
+  }
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
   height: 6px;

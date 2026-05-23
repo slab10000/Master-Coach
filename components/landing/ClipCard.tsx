@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Play, History, Clock, Sparkles } from "lucide-react";
+import { Play, History, Clock } from "lucide-react";
 import { formatDuration } from "@/lib/utils";
 import type { ClipMeta } from "@/lib/types";
 
@@ -11,7 +11,7 @@ export function ClipCard({ clip, index }: { clip: ClipMeta; index: number }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.4, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent backdrop-blur"
+      className="group relative overflow-hidden border border-white/12 bg-black/42 shadow-[0_22px_70px_rgba(0,0,0,0.35)] backdrop-blur-xl"
     >
       <div className="aspect-video bg-pitch-900 relative overflow-hidden">
         {clip.thumbnailPath ? (
@@ -24,24 +24,24 @@ export function ClipCard({ clip, index }: { clip: ClipMeta; index: number }) {
         ) : (
           <div className="pitch-stripes w-full h-full" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/82 via-black/10 to-transparent" />
         <div className="absolute top-3 left-3 flex items-center gap-2">
           {clip.hasCachedAnalysis ? (
-            <span className="text-[10px] uppercase tracking-widest font-semibold bg-gold-400 text-pitch-900 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] uppercase tracking-widest font-black bg-gold-400 text-pitch-900 px-2 py-0.5">
               Cached
             </span>
           ) : (
-            <span className="text-[10px] uppercase tracking-widest font-semibold bg-broadcast text-pitch-900 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] uppercase tracking-widest font-black bg-broadcast text-pitch-900 px-2 py-0.5">
               New
             </span>
           )}
           {clip.sidecar?.competition && (
-            <span className="text-[10px] uppercase tracking-widest font-medium text-white/70 bg-black/40 backdrop-blur px-2 py-0.5 rounded-full border border-white/10">
+            <span className="text-[10px] uppercase tracking-widest font-medium text-white/70 bg-black/45 backdrop-blur px-2 py-0.5 border border-white/10">
               {clip.sidecar.competition}
             </span>
           )}
         </div>
-        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-white/80 text-xs font-mono bg-black/60 backdrop-blur px-2 py-1 rounded">
+        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-white/85 text-xs font-mono bg-black/65 backdrop-blur px-2 py-1">
           <Clock className="w-3 h-3" />
           {formatDuration(clip.durationSeconds)}
         </div>
@@ -60,7 +60,7 @@ export function ClipCard({ clip, index }: { clip: ClipMeta; index: number }) {
         <div className="mt-4 flex gap-2">
           <Link
             href={`/analyze/${clip.id}?run=1`}
-            className="flex-1 flex items-center justify-center gap-2 bg-gold-400 hover:bg-gold-500 text-pitch-900 font-semibold px-3 py-2 rounded-lg text-sm transition"
+            className="flex-1 flex items-center justify-center gap-2 bg-gold-400 hover:bg-gold-500 text-pitch-900 font-black px-3 py-2 text-sm transition"
           >
             <Play className="w-3.5 h-3.5 fill-pitch-900" />
             Analyze
@@ -68,7 +68,7 @@ export function ClipCard({ clip, index }: { clip: ClipMeta; index: number }) {
           {clip.hasCachedAnalysis && (
             <Link
               href={`/analyze/${clip.id}`}
-              className="flex items-center justify-center gap-2 border border-white/15 hover:border-white/40 text-white px-3 py-2 rounded-lg text-sm transition"
+              className="flex items-center justify-center gap-2 border border-white/15 hover:border-white/40 text-white px-3 py-2 text-sm transition"
             >
               <History className="w-3.5 h-3.5" />
               Open
