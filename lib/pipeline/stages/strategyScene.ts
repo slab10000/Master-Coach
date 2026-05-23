@@ -7,6 +7,7 @@ import type {
   StrategyZone,
   TacticalAnalysis,
 } from "@/lib/types";
+import type { GeometrySolution } from "./geometryPass";
 
 const FOCUS_COLOR = "#4DD8FF";
 const OPPONENT_COLOR = "#F8F5EC";
@@ -14,6 +15,7 @@ const OPPONENT_COLOR = "#F8F5EC";
 export async function strategyScene(
   clipId: string,
   analysis: TacticalAnalysis,
+  geometry?: GeometrySolution,
 ): Promise<StrategyScene> {
   emitStage(clipId, "strategyScene", "started", "Building strategy board");
 
@@ -51,7 +53,10 @@ export async function strategyScene(
   const actions: StrategyAction[] = [];
   const ball: { t: number; x: number; y: number }[] = [];
 
-  for (const e of analysis.events ?? []) {
+  const sortedEvents = [...(analysis.events ?? [])].sort((a, b) => a.start - b.start);
+  const eventCount = sortedEvents.length;
+  let eventIdx = 0;
+  for (const e of sortedEvents) {
     const fromId = ensurePlayer(e.team, e.from?.number, e.from?.name, e.from?.role);
     const otherTeam: "focus" | "opponent" = e.team === "focus" ? "focus" : "opponent";
     const toId = ensurePlayer(otherTeam, e.to?.number, e.to?.name, e.to?.role);
@@ -64,6 +69,15 @@ export async function strategyScene(
     if (e.from?.x != null && e.from?.y != null) ball.push({ t: e.start, x: e.from.x, y: e.from.y });
     if (e.to?.x != null && e.to?.y != null) ball.push({ t: e.end, x: e.to.x, y: e.to.y });
 
+    // Sensible left-to-right fallback if coords missing: spread events along the pitch by order.
+    const t = eventCount > 1 ? eventIdx / (eventCount - 1) : 0.5;
+    const fbX = 25 + t * 65; // 25 → 90 across the play
+    const fbY = 34 + (eventIdx % 2 === 0 ? -8 : 8); // gentle zig-zag so arrows don't stack
+    const fromX = e.from?.x ?? fbX;
+    const fromY = e.from?.y ?? fbY;
+    const toX = e.to?.x ?? Math.min(95, fbX + 10);
+    const toY = e.to?.y ?? 34;
+
     actions.push({
       id: e.id,
       type: mapActionType(e.type),
@@ -72,11 +86,24 @@ export async function strategyScene(
       to_player_id: toId ?? undefined,
       start: e.start,
       end: e.end,
-      from: { x: e.from?.x ?? 50, y: e.from?.y ?? 34 },
-      to: { x: e.to?.x ?? 60, y: e.to?.y ?? 34 },
+      from: { x: fromX, y: fromY },
+      to: { x: toX, y: toY },
       label: e.tactical_effect || e.description,
       color_role: e.team === "focus" ? "primary" : "danger",
     });
+    eventIdx++;
+  }
+
+  // Fold in geometry-pass samples for richer player tracks + ball trajectory.
+  if (geometry) {
+    for (const ps of geometry.player_samples ?? []) {
+      const key = ensurePlayer(ps.team, ps.number, undefined, ps.role);
+      if (!key) continue;
+      playerMap.get(key)!.positions.push({ t: ps.t, x: ps.x, y: ps.y });
+    }
+    for (const bs of geometry.ball_samples ?? []) {
+      ball.push({ t: bs.t, x: bs.x, y: bs.y });
+    }
   }
 
   // Sort positions per player by time

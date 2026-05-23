@@ -4,12 +4,15 @@ import { intake } from "./stages/intake";
 import { extractFrames, ensureThumbnail } from "./stages/extractFrames";
 import { matchContext } from "./stages/matchContext";
 import { geminiTactical } from "./stages/geminiTactical";
+import { topdownMinimaps } from "./stages/topdownMinimaps";
+import { geometryPass, applyGeometry } from "./stages/geometryPass";
 import { classifyFrames } from "./stages/classifyFrames";
 import { selectHeroFrames } from "./stages/selectHeroFrames";
 import { annotateFrames } from "./stages/annotateFrames";
 import { strategyScene } from "./stages/strategyScene";
 import { counterplay } from "./stages/counterplay";
 import { emitStage } from "./events";
+import { writeJson } from "@/lib/fs/analysis";
 import type { MatchHint } from "@/lib/types";
 
 export interface PipelineInput {
@@ -28,30 +31,45 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
   const { clipId, clipPath, hint } = input;
   try {
     await ensureThumbnail(clipId, clipPath);
-
-    // Run intake first
     await intake(clipId, clipPath);
 
     const eventHint =
       [hint?.competition, hint?.match, hint?.minute, hint?.event].filter(Boolean).join(" ") ||
       "football match";
 
-    // Parallel block: match context (also drives tactical analysis) || frame extraction
+    // Kick everything off in parallel as early as we can:
+    //  - match context (text) → feeds tactical narrative
+    //  - frame extraction (ffmpeg) → feeds minimaps + classifier
+    //  - narrative tactical pass (video → events, no coords)
+    // As soon as frames land, fire ALL minimap image-gen requests at once.
     const factsPromise = matchContext(clipId, hint);
     const framesPromise = extractFrames(clipId, clipPath, 4);
+
+    const minimapsPromise = framesPromise.then((frames) =>
+      topdownMinimaps(clipId, frames, 6),
+    );
+
     const facts = await factsPromise;
-    const [analysis, frames] = await Promise.all([
-      geminiTactical(clipId, clipPath, facts, hint),
+    const analysisPromise = geminiTactical(clipId, clipPath, facts, hint);
+
+    const [analysis, frames, minimaps] = await Promise.all([
+      analysisPromise,
       framesPromise,
+      minimapsPromise,
     ]);
+
+    // Geometry pass needs both the narrative events and the minimaps.
+    const geometry = await geometryPass(clipId, analysis, minimaps);
+    applyGeometry(analysis, geometry);
+    // Persist the enriched analysis so the UI reads merged coords.
+    await writeJson(clipId, "tactical_analysis.json", analysis);
 
     const classifications = await classifyFrames(clipId, frames, eventHint);
     const heroes = await selectHeroFrames(clipId, analysis, classifications);
     const heroFrames = await annotateFrames(clipId, heroes, analysis);
-    const scene = await strategyScene(clipId, analysis);
+    const scene = await strategyScene(clipId, analysis, geometry);
     await counterplay(clipId, analysis, scene, hint);
 
-    // best-effort: write a summary index
     await fs.writeFile(
       path.join(process.cwd(), "analysis", clipId, "index.json"),
       JSON.stringify({ clipId, heroFrames: heroFrames.map((h) => h.eventId) }, null, 2),

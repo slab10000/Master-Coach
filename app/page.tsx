@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -13,37 +12,12 @@ import {
   Trophy,
 } from "lucide-react";
 import { listClips } from "@/lib/fs/clips";
+import { ConfettiField } from "@/components/landing/ConfettiField";
 import { ProviderToggle } from "@/components/landing/ProviderToggle";
 import { formatDuration } from "@/lib/utils";
 import type { ClipMeta } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-const confetti = [
-  { x: 6, delay: -1.2, duration: 8.4, color: "#F5C451", w: 7, h: 18 },
-  { x: 11, delay: -4.1, duration: 9.1, color: "#4DD8FF", w: 5, h: 14 },
-  { x: 17, delay: -7.4, duration: 10.2, color: "#FF4D3D", w: 8, h: 17 },
-  { x: 23, delay: -2.8, duration: 7.6, color: "#F8F5EC", w: 5, h: 16 },
-  { x: 29, delay: -5.3, duration: 9.8, color: "#35D06E", w: 8, h: 15 },
-  { x: 34, delay: -0.7, duration: 8.9, color: "#F5C451", w: 6, h: 19 },
-  { x: 39, delay: -6.2, duration: 11.3, color: "#4DD8FF", w: 6, h: 16 },
-  { x: 44, delay: -3.6, duration: 8.1, color: "#FF4D3D", w: 9, h: 14 },
-  { x: 49, delay: -8.8, duration: 10.9, color: "#F5C451", w: 5, h: 18 },
-  { x: 54, delay: -1.9, duration: 9.3, color: "#F8F5EC", w: 7, h: 15 },
-  { x: 59, delay: -5.9, duration: 8.5, color: "#35D06E", w: 6, h: 17 },
-  { x: 63, delay: -4.5, duration: 10.6, color: "#F5C451", w: 8, h: 18 },
-  { x: 68, delay: -7.1, duration: 9.6, color: "#4DD8FF", w: 5, h: 15 },
-  { x: 73, delay: -2.2, duration: 8.8, color: "#FF4D3D", w: 8, h: 16 },
-  { x: 78, delay: -6.7, duration: 11.2, color: "#F8F5EC", w: 6, h: 18 },
-  { x: 83, delay: -3.1, duration: 9.9, color: "#35D06E", w: 7, h: 14 },
-  { x: 88, delay: -8.2, duration: 10.4, color: "#F5C451", w: 8, h: 17 },
-  { x: 94, delay: -4.8, duration: 8.6, color: "#4DD8FF", w: 5, h: 16 },
-  { x: 14, delay: -9.4, duration: 12.2, color: "#F5C451", w: 4, h: 12 },
-  { x: 32, delay: -10.7, duration: 13.1, color: "#FF4D3D", w: 5, h: 13 },
-  { x: 52, delay: -11.5, duration: 12.8, color: "#F8F5EC", w: 4, h: 14 },
-  { x: 71, delay: -9.9, duration: 13.6, color: "#35D06E", w: 5, h: 12 },
-  { x: 91, delay: -12.4, duration: 12.5, color: "#F5C451", w: 4, h: 13 },
-];
 
 const pipelineSteps = [
   {
@@ -82,26 +56,7 @@ export default async function LandingPage() {
       <div className="landing-background" aria-hidden="true" />
       <div className="landing-vignette" aria-hidden="true" />
 
-      <div className="confetti-field" aria-hidden="true">
-        {confetti.map((piece, index) => (
-          <span
-            key={`${piece.x}-${index}`}
-            className="confetti-piece"
-            style={
-              {
-                "--x": `${piece.x}%`,
-                "--delay": `${piece.delay}s`,
-                "--duration": `${piece.duration}s`,
-                "--color": piece.color,
-                "--w": `${piece.w}px`,
-                "--h": `${piece.h}px`,
-                "--drift": `${index % 2 === 0 ? 42 : -38}px`,
-                "--spin": `${index % 3 === 0 ? 420 : -360}deg`,
-              } as CSSProperties
-            }
-          />
-        ))}
-      </div>
+      <ConfettiField />
 
       <header className="absolute left-0 right-0 top-0 z-30 mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
         <Link href="/" className="group flex items-center gap-3">

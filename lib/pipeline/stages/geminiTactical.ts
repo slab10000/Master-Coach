@@ -42,8 +42,6 @@ const TACTICAL_SCHEMA = {
               number: { type: Type.NUMBER },
               name: { type: Type.STRING },
               role: { type: Type.STRING },
-              x: { type: Type.NUMBER },
-              y: { type: Type.NUMBER },
             },
           },
           to: {
@@ -52,8 +50,6 @@ const TACTICAL_SCHEMA = {
               number: { type: Type.NUMBER },
               name: { type: Type.STRING },
               role: { type: Type.STRING },
-              x: { type: Type.NUMBER },
-              y: { type: Type.NUMBER },
             },
           },
           description: { type: Type.STRING },
@@ -145,11 +141,11 @@ ${factsText}
 
 Answer in the structured schema. Use clip_id="${clipId}".
 
-Use a normalized pitch coordinate system in event positions: x in [0,100] (left to right), y in [0,68] (bottom to top of the pitch). Attacking direction is left to right for the attacking team in the clip.
+Focus on NARRATIVE only — describe events, players, timings. DO NOT include pitch coordinates; a separate geometry pass will assign positions from a top-down view.
 
 For every pass/run/shot event:
 - Provide start and end timestamps in seconds (within the clip).
-- Provide approximate x,y for from and to. Use role like "RW", "LCM", "RB", or "CF" plus shirt number if visible. If identity is unclear, omit name.
+- Use role like "RW", "LCM", "RB", or "CF" plus shirt number if visible. If identity is unclear, omit name.
 - Provide a one-sentence tactical_effect explaining what changed because of the event.
 
 key_moments are the 2–4 most important inflection points: line broken, space opened, decision point, finish.

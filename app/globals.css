@@ -18,9 +18,9 @@ body {
 
 .stadium-bg {
   background:
-    radial-gradient(80% 60% at 50% 0%, rgba(245, 196, 81, 0.08), transparent 60%),
-    radial-gradient(120% 80% at 50% 100%, rgba(77, 216, 255, 0.06), transparent 60%),
-    linear-gradient(180deg, #071411 0%, #050d0b 60%, #030806 100%);
+    radial-gradient(80% 60% at 50% 0%, rgba(245, 196, 81, 0.12), transparent 60%),
+    radial-gradient(120% 80% at 50% 100%, rgba(77, 216, 255, 0.09), transparent 60%),
+    linear-gradient(180deg, #0c1f1a 0%, #081612 60%, #06100d 100%);
 }
 
 .pitch-stripes {
@@ -64,7 +64,7 @@ body {
 .world-cup-landing {
   position: relative;
   isolation: isolate;
-  background: #030806;
+  background: #081612;
   height: 100vh;
   max-height: 100vh;
 }
@@ -77,7 +77,7 @@ body {
   background-position: center top;
   background-size: cover;
   transform: scale(1.02);
-  filter: saturate(1.08) contrast(1.06);
+  filter: saturate(1.08) contrast(1.04) brightness(1.08);
 }
 
 .landing-vignette {
@@ -86,10 +86,10 @@ body {
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(50% 56% at 78% 42%, rgba(245, 196, 81, 0.13), transparent 58%),
-    radial-gradient(42% 42% at 48% 36%, rgba(77, 216, 255, 0.08), transparent 68%),
-    linear-gradient(90deg, rgba(3, 8, 6, 0.92) 0%, rgba(3, 8, 6, 0.64) 30%, rgba(3, 8, 6, 0.18) 56%, rgba(3, 8, 6, 0.56) 100%),
-    linear-gradient(180deg, rgba(3, 8, 6, 0.18) 0%, rgba(3, 8, 6, 0.2) 48%, rgba(3, 8, 6, 0.82) 100%);
+    radial-gradient(50% 56% at 78% 42%, rgba(245, 196, 81, 0.16), transparent 58%),
+    radial-gradient(42% 42% at 48% 36%, rgba(77, 216, 255, 0.11), transparent 68%),
+    linear-gradient(90deg, rgba(3, 8, 6, 0.78) 0%, rgba(3, 8, 6, 0.44) 30%, rgba(3, 8, 6, 0.08) 56%, rgba(3, 8, 6, 0.38) 100%),
+    linear-gradient(180deg, rgba(3, 8, 6, 0.1) 0%, rgba(3, 8, 6, 0.12) 48%, rgba(3, 8, 6, 0.58) 100%);
 }
 
 .confetti-field {
@@ -112,6 +112,12 @@ body {
   box-shadow: 0 0 16px color-mix(in srgb, var(--color), transparent 55%);
   animation: confettiFall var(--duration) linear var(--delay) infinite;
   will-change: transform;
+}
+
+.confetti-piece--burst {
+  opacity: 0.95;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color), transparent 40%);
+  animation: confettiFall var(--duration) linear var(--delay) forwards;
 }
 
 @keyframes confettiFall {
@@ -149,13 +155,13 @@ body {
 @media (max-width: 1023px) {
   .landing-background {
     background-position: 62% top;
-    opacity: 0.8;
+    opacity: 0.92;
   }
 
   .landing-vignette {
     background:
-      linear-gradient(90deg, rgba(3, 8, 6, 0.94), rgba(3, 8, 6, 0.6)),
-      linear-gradient(180deg, rgba(3, 8, 6, 0.16), rgba(3, 8, 6, 0.9));
+      linear-gradient(90deg, rgba(3, 8, 6, 0.78), rgba(3, 8, 6, 0.4)),
+      linear-gradient(180deg, rgba(3, 8, 6, 0.08), rgba(3, 8, 6, 0.68));
   }
 }
 

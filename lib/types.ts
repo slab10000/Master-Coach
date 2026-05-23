@@ -169,6 +169,8 @@ export type PipelineStage =
   | "matchContext"
   | "matchFacts"
   | "geminiTactical"
+  | "topdownMinimaps"
+  | "geometryPass"
   | "classifyFrames"
   | "selectHeroFrames"
   | "annotateFrames"
@@ -190,6 +192,8 @@ export const STAGE_LABELS: Record<PipelineStage, string> = {
   matchContext: "Finding match context",
   matchFacts: "Building match facts",
   geminiTactical: "Watching the play",
+  topdownMinimaps: "Redrawing play as top-down diagrams",
+  geometryPass: "Solving pitch geometry",
   classifyFrames: "Mapping ball action",
   selectHeroFrames: "Choosing hero moments",
   annotateFrames: "Drawing tactical overlays",

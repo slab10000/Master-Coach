@@ -2,7 +2,7 @@
   "$schema": "https://docs.rocketride.org/schema/pipe.v1.json",
   "name": "master-coach-analysis",
   "version": "0.1.0",
-  "description": "Local football clip → tactical board + Nano Banana broadcast overlays + coach fixes.",
+  "description": "Local football clip → narrative tactical events + top-down minimap geometry solve → tactical board + Nano Banana broadcast overlays + coach fixes.",
   "source": {
     "id": "src.webhook",
     "type": "webhook",
@@ -54,10 +54,34 @@
     {
       "id": "gemini_tactical",
       "type": "llm.gemini.video",
-      "label": "Multimodal Tactical Analysis",
+      "label": "Multimodal Tactical Narrative (no coordinates)",
       "model": "${env.GEMINI_VIDEO_MODEL}",
       "schema": "tactical_analysis.json",
       "inputs": ["intake", "match_facts"]
+    },
+    {
+      "id": "topdown_minimaps",
+      "type": "llm.gemini.image_edit",
+      "label": "Top-down Tactical Minimaps (fan-out, parallel)",
+      "model": "${env.GEMINI_IMAGE_EDIT_MODEL}",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/topdownMinimaps.ts",
+      "fanout": {
+        "over": "extract_frames.samples",
+        "sample_count": 6,
+        "concurrency": 6
+      },
+      "inputs": ["extract_frames"]
+    },
+    {
+      "id": "geometry_pass",
+      "type": "llm.gemini.structured",
+      "label": "Pitch Geometry Solver (events + minimaps → x/y)",
+      "model": "${env.GEMINI_TEXT_MODEL}",
+      "runtime": "node",
+      "entry": "lib/pipeline/stages/geometryPass.ts",
+      "schema": "geometry.json",
+      "inputs": ["gemini_tactical", "topdown_minimaps"]
     },
     {
       "id": "classify_frames",
@@ -99,7 +123,7 @@
       "label": "Strategy Scene Builder",
       "runtime": "node",
       "entry": "lib/pipeline/stages/strategyScene.ts",
-      "inputs": ["gemini_tactical"]
+      "inputs": ["gemini_tactical", "geometry_pass"]
     },
     {
       "id": "counterplay",
@@ -117,6 +141,9 @@
     "analysis/${clip_id}/tactical_analysis.json",
     "analysis/${clip_id}/frame_observations.json",
     "analysis/${clip_id}/hero_frames/*.webp",
+    "analysis/${clip_id}/minimaps/*.webp",
+    "analysis/${clip_id}/minimaps.json",
+    "analysis/${clip_id}/geometry.json",
     "analysis/${clip_id}/strategy_scene.json",
     "analysis/${clip_id}/counterplay.json"
   ]
