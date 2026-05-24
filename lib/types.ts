@@ -177,6 +177,7 @@ export type PipelineStage =
   | "annotateFrames"
   | "strategyImages"
   | "strategyScene"
+  | "cinematicSvg"
   | "counterplay";
 
 export interface PipelineEvent {
@@ -201,5 +202,6 @@ export const STAGE_LABELS: Record<PipelineStage, string> = {
   annotateFrames: "Drawing tactical overlays",
   strategyImages: "Drawing broadcast + top-down per hero frame",
   strategyScene: "Building tactical board",
+  cinematicSvg: "Animating cinematic replay",
   counterplay: "Generating coach fixes",
 };

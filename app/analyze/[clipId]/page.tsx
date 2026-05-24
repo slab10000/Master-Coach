@@ -1,5 +1,7 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import { getClipById } from "@/lib/fs/clips";
-import { readJson } from "@/lib/fs/analysis";
+import { analysisDir, readJson } from "@/lib/fs/analysis";
 import { notFound } from "next/navigation";
 import { AnalysisApp } from "@/components/analysis/AnalysisApp";
 import type {
@@ -24,19 +26,30 @@ export default async function AnalyzePage({
   const clip = await getClipById(clipId);
   if (!clip) notFound();
 
-  const [strategyScene, tacticalAnalysis, counterplay, matchFacts, heroFrames] = await Promise.all([
-    readJson<StrategyScene>(clipId, "strategy_scene.json"),
-    readJson<TacticalAnalysis>(clipId, "tactical_analysis.json"),
-    readJson<Counterplay>(clipId, "counterplay.json"),
-    readJson<MatchFacts>(clipId, "match_context.json"),
-    readJson<HeroFrame[]>(clipId, "hero_frames.json"),
-  ]);
+  const [strategyScene, tacticalAnalysis, counterplay, matchFacts, heroFrames, cinematicSvg] =
+    await Promise.all([
+      readJson<StrategyScene>(clipId, "strategy_scene.json"),
+      readJson<TacticalAnalysis>(clipId, "tactical_analysis.json"),
+      readJson<Counterplay>(clipId, "counterplay.json"),
+      readJson<MatchFacts>(clipId, "match_context.json"),
+      readJson<HeroFrame[]>(clipId, "hero_frames.json"),
+      fs
+        .readFile(path.join(analysisDir(clipId), "cinematic.svg"), "utf-8")
+        .catch(() => null),
+    ]);
 
   return (
     <AnalysisApp
       clipId={clipId}
       autoRun={sp.run === "1" && !strategyScene}
-      initial={{ strategyScene, tacticalAnalysis, counterplay, matchFacts, heroFrames }}
+      initial={{
+        strategyScene,
+        tacticalAnalysis,
+        counterplay,
+        matchFacts,
+        heroFrames,
+        cinematicSvg,
+      }}
     />
   );
 }

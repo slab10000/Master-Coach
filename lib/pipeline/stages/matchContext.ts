@@ -85,10 +85,15 @@ export async function matchContext(clipId: string, hint: MatchHint | undefined):
       },
     });
     searchSnippets = grounded.text ?? "";
-    emitStage(clipId, "matchContext", "progress", "Gathered web context");
+    emitStage(
+      clipId,
+      "matchContext",
+      "done",
+      `Gathered web context (${searchSnippets.length} chars)`,
+    );
   } catch (err) {
     console.error("grounded search failed", err);
-    emitStage(clipId, "matchContext", "progress", "Search unavailable, using hint only");
+    emitStage(clipId, "matchContext", "done", "Search unavailable, using hint only");
   }
 
   emitStage(clipId, "matchFacts", "started", "Structuring match facts");

@@ -9,6 +9,7 @@ import { classifyFrames } from "./stages/classifyFrames";
 import { selectHeroFrames } from "./stages/selectHeroFrames";
 import { strategyImages } from "./stages/strategyImages";
 import { strategyScene } from "./stages/strategyScene";
+import { cinematicSvg } from "./stages/cinematicSvg";
 import { counterplay } from "./stages/counterplay";
 import { emitStage } from "./events";
 import { writeJson } from "@/lib/fs/analysis";
@@ -57,7 +58,15 @@ export async function runPipeline(input: PipelineInput): Promise<PipelineOutput>
     await writeJson(clipId, "tactical_analysis.json", analysis);
 
     const scene = await strategyScene(clipId, analysis, geometry);
-    await counterplay(clipId, analysis, scene, hint);
+
+    // Cinematic SVG + counterplay can run in parallel: both depend only on the analysis+scene.
+    await Promise.all([
+      cinematicSvg(clipId, analysis, topdownMinimaps).catch((err) => {
+        console.warn("cinematicSvg failed", err);
+        return null;
+      }),
+      counterplay(clipId, analysis, scene, hint),
+    ]);
 
     await fs.writeFile(
       path.join(process.cwd(), "analysis", clipId, "index.json"),
